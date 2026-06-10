@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #0F1117;
+  --color-panel: #1A1D27;
+  --color-border: #2A2D3E;
+  --color-text-primary: #E2E8F0;
+  --color-text-secondary: #94A3B8;
+  --color-accent: #4F8EF7;
+  --color-accent-hover: #3b7ad4;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-primary font-sans antialiased;
+    margin: 0;
+  }
+}
+
+/* Custom code scrollbars for UI panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0F1117;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2D3E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4F8EF7;
+}
+
+/* Tab button transition */
+.tab-transition {
+  transition: all 0.2s ease-in-out;
+}
