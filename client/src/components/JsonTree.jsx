@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
 
 const TreeNode = ({ name, value, path, level, expandedPaths, togglePath }) => {
   const isObject = value !== null && typeof value === 'object';
   const isArray = Array.isArray(value);
-  const isExpanded = expandedPaths[path] ?? (level === 0); // Expand top-level node by default
+  const isExpanded = expandedPaths[path] ?? (level === 0);
 
   const indentStyle = { paddingLeft: `${level * 16}px` };
 
@@ -30,7 +29,6 @@ const TreeNode = ({ name, value, path, level, expandedPaths, togglePath }) => {
     if (isArray) {
       return <span className="text-secondary font-mono font-medium">{`[ ${value.length} items ]`}</span>;
     }
-    // Object
     return <span className="text-secondary font-mono font-medium">{`{ ${Object.keys(value).length} keys }`}</span>;
   };
 
@@ -39,22 +37,18 @@ const TreeNode = ({ name, value, path, level, expandedPaths, togglePath }) => {
       {/* Node row */}
       <div 
         onClick={handleToggle}
-        className={`flex items-start gap-1.5 py-1 px-2 text-xs hover:bg-[#222533]/40 rounded-sm cursor-pointer transition-colors ${
+        className={`flex items-start gap-1 py-1 px-2 text-xs hover:bg-[#222533]/40 rounded-sm cursor-pointer transition-colors ${
           isObject ? 'font-medium' : ''
         }`}
         style={indentStyle}
       >
-        {/* Toggle icon */}
+        {/* Simple text markers instead of icons */}
         {isObject ? (
-          <span className="mt-0.5 shrink-0 text-secondary hover:text-primary">
-            {isExpanded ? (
-              <ChevronDown className="w-3.5 h-3.5" />
-            ) : (
-              <ChevronRight className="w-3.5 h-3.5" />
-            )}
+          <span className="mt-0.5 shrink-0 text-secondary hover:text-primary font-mono text-[9px] w-5 text-center">
+            {isExpanded ? '[-]' : '[+]'}
           </span>
         ) : (
-          <span className="w-3.5 h-3.5 shrink-0" />
+          <span className="w-5 shrink-0" />
         )}
 
         {/* Key name */}
@@ -150,14 +144,14 @@ const JsonTree = ({ data }) => {
         <button 
           type="button"
           onClick={handleExpandAll}
-          className="px-2.5 py-1.5 bg-panel border border-border hover:border-accent text-secondary hover:text-primary rounded-btn transition-colors"
+          className="px-2.5 py-1.5 bg-panel border border-border hover:border-accent text-secondary hover:text-primary rounded-btn transition-colors font-mono"
         >
           Expand All
         </button>
         <button 
           type="button"
           onClick={handleCollapseAll}
-          className="px-2.5 py-1.5 bg-panel border border-border hover:border-accent text-secondary hover:text-primary rounded-btn transition-colors"
+          className="px-2.5 py-1.5 bg-panel border border-border hover:border-accent text-secondary hover:text-primary rounded-btn transition-colors font-mono"
         >
           Collapse All
         </button>

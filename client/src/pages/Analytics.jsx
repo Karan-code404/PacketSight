@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  BarChart2, RefreshCw, Send, CheckCircle, Timer, 
-  Database, Globe, ShieldCheck, TrendingUp, GitBranch, 
-  PieChart as PieIcon, Package, Clock, AlertTriangle, ExternalLink,
-  Loader2
-} from 'lucide-react';
-import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, 
   CartesianGrid, Tooltip, ReferenceLine, PieChart, Pie, 
-  Cell, Legend, BarChart, Bar, LabelList
+  Cell, BarChart, Bar, LabelList
 } from 'recharts';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { formatBytes, formatMs, formatNumber, formatDate } from '../utils/formatters';
+import { formatBytes, formatDate } from '../utils/formatters';
 
 const renderDonutCenter = (total) => {
   return (
@@ -34,29 +28,21 @@ const Analytics = () => {
     loading, error, refetch 
   } = useAnalytics(limit);
 
-  // Card coloring conditions
-  const getSuccessRateColor = (rate) => {
-    if (rate >= 80) return 'text-success bg-success/10 border-success/20';
-    if (rate >= 60) return 'text-info bg-info/10 border-info/20';
-    return 'text-danger bg-danger/10 border-danger/20';
+  // Card coloring conditions (Simplified to plain styles)
+  const getSuccessRateColor = () => {
+    return 'text-primary bg-panel border-border';
   };
 
-  const getLatencyColor = (time) => {
-    if (time < 500) return 'text-success bg-success/10 border-success/20';
-    if (time <= 1000) return 'text-info bg-info/10 border-info/20';
-    return 'text-danger bg-danger/10 border-danger/20';
+  const getLatencyColor = () => {
+    return 'text-primary bg-panel border-border';
   };
 
-  const getHttpsColor = (pct) => {
-    if (pct >= 90) return 'text-success bg-success/10 border-success/20';
-    if (pct >= 70) return 'text-info bg-info/10 border-info/20';
-    return 'text-danger bg-danger/10 border-danger/20';
+  const getHttpsColor = () => {
+    return 'text-primary bg-panel border-border';
   };
 
-  const getTopHostLatencyColorClass = (time) => {
-    if (time < 500) return 'text-success font-semibold';
-    if (time <= 1000) return 'text-info font-semibold';
-    return 'text-danger font-semibold';
+  const getTopHostLatencyColorClass = () => {
+    return 'text-primary';
   };
 
   // Recharts custom tooltips
@@ -67,7 +53,7 @@ const Analytics = () => {
         <div className="bg-[#1A1D27] border border-border p-3 rounded-btn shadow-card text-[11px] font-mono leading-relaxed space-y-1">
           <p className="text-primary font-bold">Request #{data.index}</p>
           <p className="text-accent truncate max-w-[200px]" title={data.url}>{data.url}</p>
-          <p className="text-[#FCA5A5] font-semibold">Latency: {data.responseTime} ms</p>
+          <p className="text-primary font-semibold">Latency: {data.responseTime} ms</p>
           <p className="text-secondary">{formatDate(data.timestamp)}</p>
         </div>
       );
@@ -110,7 +96,6 @@ const Analytics = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-start gap-3">
-          <BarChart2 className="w-8 h-8 text-accent shrink-0 mt-1" />
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-primary">Traffic Analytics</h1>
             <p className="text-secondary text-sm mt-1">Visual breakdown of your API traffic patterns.</p>
@@ -146,10 +131,10 @@ const Analytics = () => {
           <button
             onClick={refetch}
             disabled={loading}
-            className="bg-panel border border-border hover:border-accent text-secondary hover:text-primary p-2.5 rounded-btn transition-colors disabled:opacity-40"
+            className="bg-panel border border-border hover:border-accent text-secondary hover:text-primary px-3 py-2 text-xs font-semibold rounded-btn transition-colors disabled:opacity-40 font-mono"
             title="Refresh statistics"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            [Refresh]
           </button>
         </div>
       </div>
@@ -158,8 +143,7 @@ const Analytics = () => {
       {error && (
         <div className="p-4 bg-danger/10 border border-danger/35 rounded-btn flex items-center justify-between gap-3 text-sm text-danger animate-fade-in">
           <div className="flex items-center gap-2.5">
-            <AlertTriangle className="w-5 h-5 shrink-0" />
-            <span>Failed to load analytics data. Please try again.</span>
+            <span>[Error] Failed to load analytics data. Please try again.</span>
           </div>
           <button
             onClick={refetch}
@@ -183,18 +167,16 @@ const Analytics = () => {
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">Total Requests</span>
-                <Send className="w-4 h-4 text-accent" />
               </div>
-              <span className="text-xl font-bold text-primary mt-2 font-mono">{formatNumber(overview.totalRequests)}</span>
+              <span className="text-xl font-bold text-primary mt-2 font-mono">{overview.totalRequests}</span>
             </div>
 
             {/* Success Rate */}
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">Success Rate</span>
-                <CheckCircle className="w-4 h-4 text-success" />
               </div>
-              <span className={`text-xl font-bold mt-2 font-mono ${getSuccessRateColor(overview.successRate).split(' ')[0]}`}>
+              <span className="text-xl font-bold mt-2 font-mono text-primary">
                 {overview.successRate}%
               </span>
             </div>
@@ -203,9 +185,8 @@ const Analytics = () => {
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">Avg Latency</span>
-                <Timer className="w-4 h-4 text-warning" />
               </div>
-              <span className={`text-xl font-bold mt-2 font-mono ${getLatencyColor(overview.averageResponseTime).split(' ')[0]}`}>
+              <span className="text-xl font-bold mt-2 font-mono text-primary">
                 {overview.averageResponseTime} ms
               </span>
             </div>
@@ -214,7 +195,6 @@ const Analytics = () => {
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">Data Transferred</span>
-                <Database className="w-4 h-4 text-purple-400" />
               </div>
               <span className="text-xl font-bold text-primary mt-2 font-mono">{formatBytes(overview.totalDataTransferred)}</span>
             </div>
@@ -223,7 +203,6 @@ const Analytics = () => {
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">Unique Hosts</span>
-                <Globe className="w-4 h-4 text-orange" />
               </div>
               <span className="text-xl font-bold text-primary mt-2 font-mono">{overview.uniqueHosts}</span>
             </div>
@@ -232,9 +211,8 @@ const Analytics = () => {
             <div className="bg-panel border border-border p-4 rounded-card shadow-card flex flex-col justify-between h-24">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] text-secondary font-bold uppercase tracking-wider font-mono">HTTPS Coverage</span>
-                <ShieldCheck className="w-4 h-4 text-success" />
               </div>
-              <span className={`text-xl font-bold mt-2 font-mono ${getHttpsColor(overview.httpsPercentage).split(' ')[0]}`}>
+              <span className="text-xl font-bold mt-2 font-mono text-primary">
                 {overview.httpsPercentage}%
               </span>
             </div>
@@ -245,7 +223,6 @@ const Analytics = () => {
       {/* SECTION 2: RESPONSE TIME TREND */}
       <div className="bg-panel border border-border p-5 rounded-card shadow-card">
         <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-4.5 h-4.5 text-accent" />
           <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Response Time Trend</h2>
         </div>
 
@@ -255,7 +232,6 @@ const Analytics = () => {
           </div>
         ) : trend.length < 2 ? (
           <div className="h-[280px] bg-bg/10 rounded-btn border border-border border-dashed flex flex-col items-center justify-center text-center p-4">
-            <Timer className="w-12 h-12 text-secondary/30 mb-2" />
             <p className="text-xs text-secondary max-w-xs leading-relaxed">
               Not enough data yet. Send at least 2 requests to see the trend.
             </p>
@@ -288,7 +264,6 @@ const Analytics = () => {
         {/* Left: Status Code Distribution (Donut style) */}
         <div className="bg-panel border border-border p-5 rounded-card shadow-card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-4 shrink-0">
-            <PieIcon className="w-4.5 h-4.5 text-accent" />
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Status Distribution</h2>
           </div>
 
@@ -350,7 +325,6 @@ const Analytics = () => {
         {/* Right: HTTP Method Distribution (Vertical bars) */}
         <div className="bg-panel border border-border p-5 rounded-card shadow-card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-4 shrink-0">
-            <GitBranch className="w-4.5 h-4.5 text-accent" />
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Request Methods</h2>
           </div>
 
@@ -395,7 +369,6 @@ const Analytics = () => {
         {/* Left: Payload Size Distribution (Horizontal bars) */}
         <div className="bg-panel border border-border p-5 rounded-card shadow-card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-4 shrink-0">
-            <Package className="w-4.5 h-4.5 text-accent" />
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Payload Distribution</h2>
           </div>
 
@@ -431,7 +404,6 @@ const Analytics = () => {
         {/* Right: Hourly Activity Heatmap */}
         <div className="bg-panel border border-border p-5 rounded-card shadow-card flex flex-col justify-between">
           <div className="flex items-center gap-2 mb-4 shrink-0">
-            <Clock className="w-4.5 h-4.5 text-accent" />
             <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Hourly Activity</h2>
           </div>
 
@@ -469,17 +441,15 @@ const Analytics = () => {
       {/* SECTION 5: TOP HOSTS TABLE */}
       <div className="bg-panel border border-border rounded-card shadow-card overflow-hidden">
         <div className="bg-[#131620] border-b border-border p-4 flex items-center gap-2">
-          <Globe className="w-4.5 h-4.5 text-accent animate-pulse" />
           <h2 className="text-sm font-bold text-primary uppercase tracking-wider font-mono">Top API Hosts</h2>
         </div>
 
         {loading ? (
           <div className="py-10 flex items-center justify-center">
-            <Loader2 className="w-6 h-6 text-accent animate-spin" />
+            <span className="text-xs text-secondary font-mono animate-pulse">[Loading...]</span>
           </div>
         ) : topHosts.length === 0 ? (
           <div className="py-10 flex flex-col items-center justify-center text-center p-4">
-            <Globe className="w-12 h-12 text-secondary/35 mb-2" />
             <span className="text-xs text-secondary italic">No host data available yet.</span>
           </div>
         ) : (
@@ -507,7 +477,7 @@ const Analytics = () => {
                       <td className="p-3.5 font-mono text-secondary">{idx + 1}</td>
 
                       {/* Host */}
-                      <td className="p-3.5 font-mono font-bold text-accent">{row.host}</td>
+                      <td className="p-3.5 font-mono font-bold text-primary">{row.host}</td>
 
                       {/* Count with progress indicator */}
                       <td className="p-3.5 max-w-[200px]">
@@ -529,13 +499,7 @@ const Analytics = () => {
 
                       {/* Success Rate */}
                       <td className="p-3.5">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
-                          row.successRate >= 80 
-                            ? 'bg-success/5 text-success border-success/20' 
-                            : row.successRate >= 60 
-                              ? 'bg-info/5 text-info border-info/20' 
-                              : 'bg-danger/5 text-danger border-danger/20'
-                        }`}>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-bg border-border text-primary">
                           {row.successRate}%
                         </span>
                       </td>
@@ -547,10 +511,10 @@ const Analytics = () => {
                             navigate(`/history?host=${row.host}`);
                             toast.success(`Navigating to history filtered by ${row.host}`);
                           }}
-                          className="bg-bg border border-border hover:border-accent text-secondary hover:text-accent p-1.5 rounded-btn transition-colors"
+                          className="bg-bg border border-border hover:border-accent text-secondary hover:text-accent px-2 py-1 text-[10px] rounded-btn transition-colors font-mono"
                           title={`View requests for ${row.host}`}
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          [History]
                         </button>
                       </td>
                     </tr>

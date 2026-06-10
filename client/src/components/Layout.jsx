@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Menu, Radar } from 'lucide-react';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
@@ -8,18 +7,15 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-bg text-primary flex flex-col md:flex-row">
-      {/* Mobile Top Navbar (hidden on desktop/tablet) */}
+      {/* Mobile Top Navbar (hidden on desktop) */}
       <header className="md:hidden flex items-center justify-between px-4 py-3 bg-panel border-b border-border sticky top-0 z-40 shrink-0">
-        <div className="flex items-center gap-2">
-          <Radar className="w-5 h-5 text-accent animate-pulse" />
-          <span className="font-semibold text-sm tracking-wide text-primary">PacketSight</span>
-        </div>
+        <span className="font-semibold text-sm tracking-wide text-primary">PacketSight</span>
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen(true)}
-          className="text-secondary hover:text-primary p-1 rounded-btn hover:bg-bg transition-colors"
+          className="text-secondary hover:text-primary text-xs font-semibold px-2 py-1.5 rounded hover:bg-bg transition-colors"
         >
-          <Menu className="w-5.5 h-5.5" />
+          [Menu]
         </button>
       </header>
 

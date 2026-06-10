@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  X, Loader2, Copy, ShieldCheck, AlertTriangle, 
-  Check, X as Cross, AlertOctagon, CheckCircle, Play, 
-  Network, Layers, List, GitBranch, Hash, FileX
-} from 'lucide-react';
 import { getRequestById } from '../services/api';
 import JsonTree from './JsonTree';
 import { getResponseSummary, analyzeStructure } from '../utils/jsonAnalyzer';
@@ -50,7 +45,6 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
   const handleReRun = () => {
     if (!request) return;
 
-    // Convert headers to format expected by RequestBuilder
     const formattedHeaders = Object.entries(request.requestHeaders || {}).map(([key, value]) => ({
       id: Math.random().toString(),
       key,
@@ -85,7 +79,6 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
     return 'bg-danger/10 text-danger border border-danger/20';
   };
 
-  // Parsing outputs
   let isValidJson = false;
   let parsedJson = null;
   let totalKeys = 0;
@@ -102,7 +95,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
     }
   }
 
-  // Insight generator rules
+  // Insight calculations
   const getInsights = (res) => {
     if (!res) return [];
     const list = [];
@@ -182,7 +175,6 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
     return list;
   };
 
-  // Compile check headers
   const getSecurityHeaderChecklist = (res) => {
     if (!res) return {};
     const resHeaders = res.responseHeaders || {};
@@ -207,7 +199,6 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
   const secHeaders = getSecurityHeaderChecklist(request);
   const insightsList = getInsights(request);
 
-  // Response structure analyzer
   const summaryStats = isValidJson ? getResponseSummary(parsedJson) : null;
   const deepStats = isValidJson ? analyzeStructure(parsedJson) : null;
 
@@ -220,7 +211,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
       />
 
       {/* Slide-over container */}
-      <div className="relative w-full max-w-[520px] h-full bg-panel border-l border-border flex flex-col shadow-2xl z-10 animate-slide-in">
+      <div className="relative w-full max-w-[520px] h-full bg-panel border-l border-border flex flex-col shadow-2xl z-10">
         
         {/* Drawer Header */}
         <div className="p-4 border-b border-border flex items-start justify-between gap-4">
@@ -237,24 +228,22 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
           </div>
           <button 
             onClick={onClose}
-            className="text-secondary hover:text-primary p-1 rounded-btn hover:bg-bg transition-colors shrink-0"
+            className="text-secondary hover:text-primary text-xs font-semibold px-2 py-1 rounded hover:bg-bg transition-colors shrink-0"
           >
-            <X className="w-4.5 h-4.5" />
+            [Close]
           </button>
         </div>
 
         {/* Loading / Error States */}
         {loading && (
           <div className="flex-1 flex flex-col items-center justify-center">
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
-            <span className="text-xs text-secondary mt-2">Loading details...</span>
+            <span className="text-xs text-secondary font-mono animate-pulse">Loading details...</span>
           </div>
         )}
 
         {error && (
           <div className="flex-1 p-6 flex flex-col items-center justify-center text-center">
-            <AlertTriangle className="w-10 h-10 text-danger mb-2" />
-            <h3 className="text-sm font-semibold text-primary">Failed to load request</h3>
+            <span className="text-sm font-semibold text-danger">[ERROR]</span>
             <p className="text-secondary text-xs mt-1">{error}</p>
           </div>
         )}
@@ -310,14 +299,12 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                       <div className="text-[9px] text-secondary font-bold uppercase tracking-wider font-mono">Protocol</div>
                       <div className="mt-1.5 flex items-center">
                         {request.protocol === 'HTTPS' ? (
-                          <span className="text-success bg-success/5 border border-success/20 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            HTTPS
+                          <span className="text-success bg-success/5 border border-success/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                            [HTTPS SECURED]
                           </span>
                         ) : (
-                          <span className="text-danger bg-danger/5 border border-danger/20 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1">
-                            <AlertTriangle className="w-3.5 h-3.5" />
-                            HTTP
+                          <span className="text-danger bg-danger/5 border border-danger/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                            [INSECURE HTTP]
                           </span>
                         )}
                       </div>
@@ -327,8 +314,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                   {/* Protocol Intelligence Section */}
                   {request.protocolIntelligence && (
                     <div className="border border-border rounded-btn overflow-hidden">
-                      <div className="bg-[#131620] border-b border-border p-3 flex items-center gap-2">
-                        <Network className="w-4 h-4 text-accent" />
+                      <div className="bg-[#131620] border-b border-border p-3">
                         <h3 className="text-xs font-bold text-primary uppercase tracking-wider font-mono">Protocol Intelligence</h3>
                       </div>
                       <div className="p-3 divide-y divide-border/40 space-y-2.5 text-xs">
@@ -375,7 +361,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                     {isValidJson ? (
                       <div className="flex gap-2">
                         <span className="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded border border-success/25">
-                          ✓ Valid JSON
+                          [Valid JSON]
                         </span>
                         <span className="bg-accent/15 text-accent text-[10px] font-bold px-2 py-0.5 rounded border border-accent/25">
                           Keys: {totalKeys}
@@ -383,15 +369,14 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                       </div>
                     ) : (
                       <span className="bg-secondary/15 text-secondary text-[10px] font-bold px-2 py-0.5 rounded border border-border">
-                        Raw Response Text
+                        [Raw String]
                       </span>
                     )}
                     <button
                       onClick={handleCopy}
                       className="bg-bg border border-border hover:border-accent text-secondary hover:text-primary px-2.5 py-1.5 rounded-btn flex items-center gap-1.5 text-xs font-semibold transition-colors"
                     >
-                      <Copy className="w-3.5 h-3.5" />
-                      {copied ? 'Copied!' : 'Copy'}
+                      {copied ? 'Copied' : 'Copy'}
                     </button>
                   </div>
                   <div className="bg-[#0F1117] border border-border rounded-btn p-4 overflow-auto max-h-[380px]">
@@ -439,7 +424,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                               <tr key={idx} className={`border-b border-border/20 ${idx % 2 === 0 ? 'bg-[#1A1D27]' : 'bg-[#141720]'}`}>
                                 <td className="p-2.5 font-semibold text-primary border-r border-border/20 w-[40%] flex items-center gap-1.5">
                                   {k}
-                                  {isSecurity && <span className="bg-accent/15 text-accent text-[9px] px-1 py-0.2 rounded border border-accent/20">🔒</span>}
+                                  {isSecurity && <span className="bg-accent/15 text-accent text-[9px] px-1 py-0.2 rounded border border-accent/20 font-bold font-mono">[SEC]</span>}
                                 </td>
                                 <td className="p-2.5 text-secondary break-all">{String(v)}</td>
                               </tr>
@@ -458,14 +443,12 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                   <div className="flex items-center justify-between p-3.5 bg-bg/40 border border-border rounded-btn">
                     <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">HTTPS Status</span>
                     {request.protocol === 'HTTPS' ? (
-                      <span className="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded border border-success/20 flex items-center gap-1">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        Secure HTTPS
+                      <span className="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded border border-success/20">
+                        [Secure HTTPS]
                       </span>
                     ) : (
-                      <span className="bg-danger/10 text-danger text-[10px] font-bold px-2 py-0.5 rounded border border-danger/20 flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5" />
-                        Insecure HTTP
+                      <span className="bg-danger/10 text-danger text-[10px] font-bold px-2 py-0.5 rounded border border-danger/20">
+                        [Insecure HTTP]
                       </span>
                     )}
                   </div>
@@ -496,22 +479,13 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                         return (
                           <div key={item.key} className="flex gap-3 p-3 bg-bg/25 border border-border rounded-btn">
                             <div className="mt-0.5">
-                              {isPresent ? (
-                                <div className="bg-success/10 text-success p-0.5 rounded-full border border-success/20">
-                                  <Check className="w-3 h-3" />
-                                </div>
-                              ) : (
-                                <div className="bg-danger/10 text-secondary p-0.5 rounded-full border border-border">
-                                  <Cross className="w-3 h-3" />
-                                </div>
-                              )}
+                              <span className="text-[10px] font-bold font-mono">
+                                {isPresent ? '[Present]' : '[Missing]'}
+                              </span>
                             </div>
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-semibold text-primary">{item.name}</span>
-                                <span className={`text-[8px] font-bold px-1.5 rounded border ${isPresent ? 'bg-success/5 text-success border-success/20' : 'bg-danger/5 text-secondary border-border'}`}>
-                                  {isPresent ? 'PRESENT' : 'MISSING'}
-                                </span>
                               </div>
                               <p className="text-[10px] text-secondary mt-0.5">{item.desc}</p>
                             </div>
@@ -527,34 +501,28 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
               {activeTab === 'insights' && (
                 <div className="space-y-3">
                   {insightsList.map((insight, idx) => {
-                    let icon, bgBorderClass, badgeClass, label;
+                    let bgBorderClass, badgeClass, label;
                     if (insight.type === 'critical') {
-                      icon = <AlertOctagon className="w-4.5 h-4.5 text-danger" />;
-                      bgBorderClass = 'bg-danger/5 border-danger/20';
+                      bgBorderClass = 'bg-danger/5 border-danger/20 text-danger';
                       badgeClass = 'bg-danger/15 text-danger border-danger/30';
-                      label = 'Critical';
+                      label = '[Critical]';
                     } else if (insight.type === 'warning') {
-                      icon = <AlertTriangle className="w-4.5 h-4.5 text-warning" />;
-                      bgBorderClass = 'bg-warning/5 border-warning/20';
+                      bgBorderClass = 'bg-warning/5 border-warning/20 text-warning';
                       badgeClass = 'bg-warning/15 text-warning border-warning/30';
-                      label = 'Warning';
+                      label = '[Warning]';
                     } else {
-                      icon = <CheckCircle className="w-4.5 h-4.5 text-success" />;
-                      bgBorderClass = 'bg-success/5 border-success/20';
+                      bgBorderClass = 'bg-success/5 border-success/20 text-success';
                       badgeClass = 'bg-success/15 text-success border-success/30';
-                      label = 'Info';
+                      label = '[Info]';
                     }
 
                     return (
-                      <div key={idx} className={`flex gap-3 p-3.5 border rounded-btn ${bgBorderClass}`}>
-                        <div className="mt-0.5 shrink-0">{icon}</div>
-                        <div className="space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-xs font-bold text-primary">{insight.title}</h4>
-                            <span className={`text-[8px] font-bold px-1 py-0.2 rounded border uppercase ${badgeClass}`}>{label}</span>
-                          </div>
-                          <p className="text-[11px] text-secondary/90 leading-relaxed">{insight.message}</p>
+                      <div key={idx} className={`flex flex-col gap-1 p-3.5 border rounded-btn ${bgBorderClass}`}>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[8px] font-bold px-1 py-0.2 rounded border uppercase font-mono ${badgeClass}`}>{label}</span>
+                          <h4 className="text-xs font-bold text-primary">{insight.title}</h4>
                         </div>
+                        <p className="text-[11px] text-secondary/90 leading-relaxed mt-1">{insight.message}</p>
                       </div>
                     );
                   })}
@@ -566,8 +534,7 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                 <div className="space-y-4">
                   {!isValidJson ? (
                     <div className="flex flex-col items-center justify-center p-8 text-center bg-bg/20 border border-border border-dashed rounded-btn">
-                      <FileX className="w-12 h-12 text-secondary/30 mb-2" />
-                      <h4 className="text-sm font-semibold text-primary">Analysis Unavailable</h4>
+                      <h4 className="text-sm font-semibold text-primary">[Analysis Unavailable]</h4>
                       <p className="text-xs text-secondary max-w-xs mt-1">
                         Response Structure analysis is only available for JSON responses.
                       </p>
@@ -601,46 +568,34 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
                         <h4 className="text-xs font-bold text-primary uppercase tracking-wider font-mono">Detected Structures</h4>
                         <div className="space-y-3 text-xs">
                           {/* Nested Objects */}
-                          <div className="flex items-start gap-2.5 bg-bg/25 border border-border p-2.5 rounded-btn">
-                            <Layers className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                            <div>
-                              <span className="font-semibold block text-primary">Nested Objects</span>
-                              <p className="text-secondary text-[11px] mt-0.5 leading-relaxed">
-                                {deepStats.nestedObjects.length > 0 
-                                  ? deepStats.nestedObjects.join(', ') 
-                                  : 'Flat structure. No nested objects detected.'}
-                              </p>
-                            </div>
+                          <div className="bg-bg/25 border border-border p-2.5 rounded-btn">
+                            <span className="font-semibold block text-primary font-mono">[Nested Objects]</span>
+                            <p className="text-secondary text-[11px] mt-1 leading-relaxed">
+                              {deepStats.nestedObjects.length > 0 
+                                ? deepStats.nestedObjects.join(', ') 
+                                : 'Flat structure. No nested objects detected.'}
+                            </p>
                           </div>
 
                           {/* Arrays */}
-                          <div className="flex items-start gap-2.5 bg-bg/25 border border-border p-2.5 rounded-btn">
-                            <List className="w-4 h-4 text-success mt-0.5 shrink-0" />
-                            <div>
-                              <span className="font-semibold block text-primary">Arrays</span>
-                              <p className="text-secondary text-[11px] mt-0.5 leading-relaxed">
-                                {deepStats.arrays.length > 0 
-                                  ? deepStats.arrays.join(', ') 
-                                  : 'No nested arrays detected.'}
-                              </p>
-                            </div>
+                          <div className="bg-bg/25 border border-border p-2.5 rounded-btn">
+                            <span className="font-semibold block text-primary font-mono">[Arrays]</span>
+                            <p className="text-secondary text-[11px] mt-1 leading-relaxed">
+                              {deepStats.arrays.length > 0 
+                                ? deepStats.arrays.join(', ') 
+                                : 'No nested arrays detected.'}
+                            </p>
                           </div>
 
                           {/* Depth and count */}
                           <div className="grid grid-cols-2 gap-3.5">
-                            <div className="flex items-center gap-2.5 bg-bg/25 border border-border p-2.5 rounded-btn">
-                              <GitBranch className="w-4 h-4 text-warning shrink-0" />
-                              <div>
-                                <span className="font-semibold block text-primary text-[11px]">Max Depth</span>
-                                <span className="text-secondary text-xs font-bold">{deepStats.maxDepth} levels</span>
-                              </div>
+                            <div className="bg-bg/25 border border-border p-2.5 rounded-btn">
+                              <span className="font-semibold block text-primary text-[10px] font-mono">[Max Depth]</span>
+                              <span className="text-secondary text-xs font-bold block mt-0.5">{deepStats.maxDepth} levels</span>
                             </div>
-                            <div className="flex items-center gap-2.5 bg-bg/25 border border-border p-2.5 rounded-btn">
-                              <Hash className="w-4 h-4 text-purple-400 shrink-0" />
-                              <div>
-                                <span className="font-semibold block text-primary text-[11px]">Total Keys</span>
-                                <span className="text-secondary text-xs font-bold">{deepStats.totalKeys} keys (deep)</span>
-                              </div>
+                            <div className="bg-bg/25 border border-border p-2.5 rounded-btn">
+                              <span className="font-semibold block text-primary text-[10px] font-mono">[Total Keys]</span>
+                              <span className="text-secondary text-xs font-bold block mt-0.5">{deepStats.totalKeys} keys</span>
                             </div>
                           </div>
                         </div>
@@ -655,9 +610,8 @@ const RequestDetailDrawer = ({ requestId, isOpen, onClose }) => {
             <div className="p-4 border-t border-border shrink-0 bg-bg/40 flex justify-end">
               <button
                 onClick={handleReRun}
-                className="bg-accent hover:bg-accent-hover text-white text-xs font-semibold py-2 px-4 rounded-btn flex items-center gap-1.5 transition-colors shadow-sm"
+                className="bg-accent hover:bg-accent-hover text-white text-xs font-semibold py-2 px-4 rounded-btn transition-colors shadow-sm"
               >
-                <Play className="w-3.5 h-3.5" />
                 Re-run Request
               </button>
             </div>

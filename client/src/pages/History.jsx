@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { 
-  Clock, Trash2, Search, Eye, AlertTriangle, 
-  Inbox, ChevronLeft, ChevronRight, ShieldCheck, 
-  AlertCircle, SearchX, Loader2
-} from 'lucide-react';
 import { toast } from 'sonner';
 import useHistory from '../hooks/useHistory';
 import { deleteRequest, clearAllHistory } from '../services/api';
@@ -100,27 +95,17 @@ const History = () => {
     }
   };
 
-  // UI Helpers
+  // UI Helpers (Simplified to white/border only)
   const getMethodBadgeColorClass = (m) => {
-    const methodStr = m?.toUpperCase();
-    if (methodStr === 'GET') return 'bg-accent/10 text-accent border border-accent/20';
-    if (methodStr === 'POST') return 'bg-success/10 text-success border border-success/20';
-    if (methodStr === 'PUT') return 'bg-warning/10 text-warning border border-warning/20';
-    if (methodStr === 'PATCH') return 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
-    return 'bg-danger/10 text-danger border border-danger/20';
+    return 'bg-bg text-primary border border-border';
   };
 
   const getStatusColorClass = (status) => {
-    if (status >= 200 && status < 300) return 'text-success bg-success/10 border-success/30';
-    if (status >= 300 && status < 400) return 'text-info bg-info/10 border-info/30';
-    if (status >= 400 && status < 500) return 'text-warning bg-warning/10 border-warning/30';
-    return 'text-danger bg-danger/10 border-danger/30';
+    return 'text-primary bg-bg border-border';
   };
 
   const getScoreBadgeColorClass = (score) => {
-    if (score >= 80) return 'bg-success/10 text-success border border-success/20';
-    if (score >= 50) return 'bg-info/10 text-info border border-info/20';
-    return 'bg-danger/10 text-danger border border-danger/20';
+    return 'bg-bg text-primary border border-border';
   };
 
   return (
@@ -128,7 +113,6 @@ const History = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-start gap-3">
-          <Clock className="w-8 h-8 text-accent shrink-0 mt-1" />
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-primary">Request History</h1>
             <p className="text-secondary text-sm mt-1">Browse, filter, and inspect previously executed API requests.</p>
@@ -140,7 +124,6 @@ const History = () => {
             disabled={requests.length === 0 && search === '' && method === 'All' && statusFilter === ''}
             className="w-full sm:w-auto border border-danger hover:bg-danger/10 text-danger text-xs font-semibold px-4 py-2.5 rounded-btn flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
           >
-            <Trash2 className="w-4 h-4" />
             Clear All History
           </button>
         </div>
@@ -154,13 +137,12 @@ const History = () => {
           
           {/* Search URL */}
           <div className="relative">
-            <Search className="absolute left-3 top-3 w-4 h-4 text-secondary/50" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by URL..."
-              className="w-full bg-bg border border-border rounded-btn pl-9 pr-3.5 py-2.5 text-xs text-primary placeholder-secondary/50 focus:outline-none focus:border-accent transition-colors"
+              className="w-full bg-bg border border-border rounded-btn px-3.5 py-2.5 text-xs text-primary placeholder-secondary/50 focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
@@ -215,15 +197,13 @@ const History = () => {
         
         {loading && (
           <div className="py-20 flex flex-col items-center justify-center">
-            <Loader2 className="w-8 h-8 text-accent animate-spin" />
-            <span className="text-xs text-secondary mt-2">Retrieving logs...</span>
+            <span className="text-xs text-secondary font-mono animate-pulse">[Loading logs...]</span>
           </div>
         )}
 
         {error && !loading && (
           <div className="py-20 flex flex-col items-center justify-center text-center px-4">
-            <AlertTriangle className="w-10 h-10 text-danger mb-2" />
-            <span className="text-sm font-semibold text-primary">An error occurred</span>
+            <span className="text-sm font-semibold text-danger">[Error occurred]</span>
             <p className="text-xs text-secondary max-w-xs mt-1">{error}</p>
           </div>
         )}
@@ -232,16 +212,14 @@ const History = () => {
           <div className="py-20 flex flex-col items-center justify-center text-center p-8">
             {search || method !== 'All' || statusFilter ? (
               <>
-                <SearchX className="w-16 h-16 text-secondary/35 mb-4" />
-                <h3 className="text-lg font-semibold text-primary mb-1">No requests found</h3>
+                <h3 className="text-lg font-semibold text-primary mb-1">[No results]</h3>
                 <p className="text-secondary text-sm max-w-xs">
                   No requests matched your query parameters. Reset filters or update search terms.
                 </p>
               </>
             ) : (
               <>
-                <Inbox className="w-16 h-16 text-secondary/35 mb-4 animate-pulse" />
-                <h3 className="text-lg font-semibold text-primary mb-1">Log book is empty</h3>
+                <h3 className="text-lg font-semibold text-primary mb-1">[History empty]</h3>
                 <p className="text-secondary text-sm max-w-xs">
                   Run some API tests in the Request Analyzer to capture traffic histories.
                 </p>
@@ -264,7 +242,7 @@ const History = () => {
                   <th className="p-3.5">Protocol</th>
                   <th className="p-3.5">Security Score</th>
                   <th className="p-3.5">Timestamp</th>
-                  <th className="p-3.5 text-right">Actions</th>
+                  <th className="p-3.5 text-right font-mono">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/20 font-medium">
@@ -293,13 +271,7 @@ const History = () => {
                     </td>
 
                     {/* Response Time */}
-                    <td className={`p-3.5 whitespace-nowrap font-mono font-bold ${
-                      r.responseTime > 3000 
-                        ? 'text-danger' 
-                        : r.responseTime > 1000 
-                          ? 'text-warning' 
-                          : 'text-primary'
-                    }`}>
+                    <td className="p-3.5 whitespace-nowrap font-mono font-bold text-primary">
                       {r.responseTime} ms
                     </td>
 
@@ -311,12 +283,12 @@ const History = () => {
                     {/* Protocol */}
                     <td className="p-3.5 whitespace-nowrap">
                       {r.protocol === 'HTTPS' ? (
-                        <span className="text-success flex items-center gap-1 font-bold text-[10px] font-mono">
-                          🔒 HTTPS
+                        <span className="text-primary font-bold text-[10px] font-mono">
+                          [HTTPS]
                         </span>
                       ) : (
-                        <span className="text-danger flex items-center gap-1 font-bold text-[10px] font-mono">
-                          ⚠️ HTTP
+                        <span className="text-secondary font-bold text-[10px] font-mono">
+                          [HTTP]
                         </span>
                       )}
                     </td>
@@ -335,23 +307,23 @@ const History = () => {
 
                     {/* Actions */}
                     <td className="p-3.5 whitespace-nowrap text-right shrink-0">
-                      <div className="flex items-center justify-end gap-1.5">
+                      <div className="flex items-center justify-end gap-1.5 text-[10px]">
                         <button
                           onClick={() => {
                             setSelectedRequestId(r._id);
                             setIsDrawerOpen(true);
                           }}
-                          className="bg-bg border border-border hover:border-accent text-secondary hover:text-accent p-1.5 rounded-btn transition-all"
+                          className="bg-bg border border-border hover:border-accent text-secondary hover:text-accent px-2 py-1 rounded-btn transition-all font-mono"
                           title="Inspect details"
                         >
-                          <Eye className="w-3.5 h-3.5" />
+                          [Inspect]
                         </button>
                         <button
                           onClick={() => handleDeleteItem(r._id)}
-                          className="bg-bg border border-border hover:border-danger text-secondary hover:text-danger p-1.5 rounded-btn transition-all"
+                          className="bg-bg border border-border hover:border-danger text-secondary hover:text-danger px-2 py-1 rounded-btn transition-all font-mono"
                           title="Delete request"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          [Delete]
                         </button>
                       </div>
                     </td>
@@ -376,9 +348,9 @@ const History = () => {
               <button
                 disabled={!pagination.hasPrevPage}
                 onClick={() => setPage(page - 1)}
-                className="bg-bg border border-border hover:border-secondary/40 hover:text-primary p-1.5 rounded-btn disabled:opacity-40 disabled:hover:border-border transition-all"
+                className="bg-bg border border-border hover:border-secondary/40 hover:text-primary px-2 py-1 rounded-btn disabled:opacity-40 disabled:hover:border-border transition-all font-semibold font-mono"
               >
-                <ChevronLeft className="w-4 h-4" />
+                [Prev]
               </button>
 
               {Array.from({ length: pagination.totalPages }, (_, index) => {
@@ -417,9 +389,9 @@ const History = () => {
               <button
                 disabled={!pagination.hasNextPage}
                 onClick={() => setPage(page + 1)}
-                className="bg-bg border border-border hover:border-secondary/40 hover:text-primary p-1.5 rounded-btn disabled:opacity-40 disabled:hover:border-border transition-all"
+                className="bg-bg border border-border hover:border-secondary/40 hover:text-primary px-2 py-1 rounded-btn disabled:opacity-40 disabled:hover:border-border transition-all font-semibold font-mono"
               >
-                <ChevronRight className="w-4 h-4" />
+                [Next]
               </button>
             </div>
 
@@ -450,30 +422,27 @@ const History = () => {
           />
           <div className="relative bg-panel border border-border rounded-card p-6 max-w-sm shadow-2xl z-10 w-full space-y-4 animate-fade-in">
             <div className="flex items-start gap-3">
-              <div className="bg-danger/10 text-danger p-2 rounded-full border border-danger/25">
-                <AlertCircle className="w-5 h-5 shrink-0" />
-              </div>
               <div className="space-y-1.5">
-                <h3 className="text-base font-bold text-primary">Clear all history?</h3>
+                <h3 className="text-base font-bold text-primary">[Clear all history?]</h3>
                 <p className="text-secondary text-xs leading-relaxed">
                   This action cannot be undone. All request traces and metrics logs will be permanently deleted from MongoDB.
                 </p>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-2.5">
+            <div className="flex items-center justify-end gap-2.5 text-xs">
               <button
                 type="button"
                 onClick={() => setIsConfirmModalOpen(false)}
-                className="bg-bg hover:bg-[#222533] border border-border text-secondary hover:text-primary text-xs font-semibold py-2 px-3.5 rounded-btn transition-colors"
+                className="bg-bg hover:bg-[#222533] border border-border text-secondary hover:text-primary py-2 px-3.5 rounded-btn transition-colors font-mono"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleWipeHistory}
-                className="bg-danger hover:bg-[#db3b3b] text-white text-xs font-semibold py-2 px-3.5 rounded-btn transition-colors"
+                className="bg-danger hover:bg-[#db3b3b] text-white py-2 px-3.5 rounded-btn transition-colors font-mono"
               >
-                Clear History
+                [Wipe]
               </button>
             </div>
           </div>

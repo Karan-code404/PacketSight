@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertOctagon, RefreshCw } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -23,10 +22,10 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen bg-bg text-primary flex flex-col items-center justify-center p-6 text-center">
-          <div className="bg-panel border border-border p-8 rounded-card max-w-md shadow-card space-y-5 animate-fade-in">
+          <div className="bg-panel border border-border p-8 rounded-card max-w-md shadow-card space-y-5">
             <div className="flex justify-center">
-              <div className="bg-danger/10 text-danger p-3 rounded-full border border-danger/25">
-                <AlertOctagon className="w-10 h-10" />
+              <div className="bg-danger/10 text-danger px-3 py-1.5 rounded border border-danger/25 text-xs font-bold font-mono">
+                [SYSTEM CRASH]
               </div>
             </div>
             
@@ -47,7 +46,6 @@ class ErrorBoundary extends React.Component {
               onClick={this.handleReload}
               className="w-full bg-accent hover:bg-accent-hover text-white text-sm font-semibold py-2 px-4 rounded-btn flex items-center justify-center gap-2 transition-all duration-200"
             >
-              <RefreshCw className="w-4 h-4" />
               Reload App
             </button>
           </div>

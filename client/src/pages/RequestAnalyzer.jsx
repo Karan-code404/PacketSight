@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { 
-  Radar, Zap, ChevronDown, Loader2, Copy, 
-  ShieldCheck, AlertTriangle, Check, X, 
-  AlertOctagon, CheckCircle, Trash2, Plus, 
-  Network, Layers, List, GitBranch, Hash, FileX
-} from 'lucide-react';
 import { toast } from 'sonner';
 import { analyzeRequest } from '../services/api';
 import JsonTree from '../components/JsonTree';
 import { getResponseSummary, analyzeStructure } from '../utils/jsonAnalyzer';
+
+const securityChecklist = [
+  { key: 'content-security-policy', name: 'Content-Security-Policy', desc: 'Prevents XSS attacks by controlling resource loading.' },
+  { key: 'strict-transport-security', name: 'Strict-Transport-Security', desc: 'Forces HTTPS connections for future requests.' },
+  { key: 'x-frame-options', name: 'X-Frame-Options', desc: 'Prevents clickjacking by blocking iframe embedding.' },
+  { key: 'x-content-type-options', name: 'X-Content-Type-Options', desc: 'Stops MIME-type sniffing attacks.' },
+  { key: 'referrer-policy', name: 'Referrer-Policy', desc: 'Controls referrer information sent with requests.' }
+];
 
 const RequestAnalyzer = () => {
   const location = useLocation();
@@ -112,12 +114,9 @@ const RequestAnalyzer = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // Helper: Status code color
+  // Helper: Status code color (Simplified to plain styles)
   const getStatusColorClass = (status) => {
-    if (status >= 200 && status < 300) return 'text-success bg-success/10 border-success/30';
-    if (status >= 300 && status < 400) return 'text-info bg-info/10 border-info/30';
-    if (status >= 400 && status < 500) return 'text-warning bg-warning/10 border-warning/30';
-    return 'text-danger bg-danger/10 border-danger/30';
+    return 'text-primary bg-bg border-border';
   };
 
   // Helper: JSON parser & key counter
@@ -205,7 +204,7 @@ const RequestAnalyzer = () => {
                 className="w-full flex items-center justify-between font-semibold text-xs text-secondary uppercase tracking-wider"
               >
                 <span>Request Headers ({headers.length})</span>
-                <ChevronDown className={`w-4 h-4 text-secondary transition-transform duration-200 ${headersExpanded ? 'rotate-180' : ''}`} />
+                <span className="text-xs font-mono">{headersExpanded ? '[-]' : '[+]'}</span>
               </button>
 
               {headersExpanded && (
@@ -229,9 +228,9 @@ const RequestAnalyzer = () => {
                       <button
                         type="button"
                         onClick={() => deleteHeader(header.id)}
-                        className="text-secondary/60 hover:text-danger p-1 transition-colors"
+                        className="text-secondary/60 hover:text-danger text-[10px] font-semibold px-2 py-1 border border-border hover:border-danger rounded transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        [Delete]
                       </button>
                     </div>
                   ))}
@@ -239,10 +238,9 @@ const RequestAnalyzer = () => {
                   <button
                     type="button"
                     onClick={addHeader}
-                    className="text-xs font-semibold text-accent hover:text-accent-hover flex items-center gap-1 mt-1 transition-colors"
+                    className="text-xs font-semibold text-accent hover:text-accent-hover mt-1 transition-colors"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    Add Header
+                    + Add Header
                   </button>
                 </div>
               )}
@@ -257,7 +255,7 @@ const RequestAnalyzer = () => {
                   className="w-full flex items-center justify-between font-semibold text-xs text-secondary uppercase tracking-wider"
                 >
                   <span>Request Body</span>
-                  <ChevronDown className={`w-4 h-4 text-secondary transition-transform duration-200 ${bodyExpanded ? 'rotate-180' : ''}`} />
+                  <span className="text-xs font-mono">{bodyExpanded ? '[-]' : '[+]'}</span>
                 </button>
 
                 {bodyExpanded && (
@@ -280,21 +278,14 @@ const RequestAnalyzer = () => {
               disabled={loading || !url}
               className="w-full bg-accent hover:bg-accent-hover text-white text-sm font-semibold py-2.5 px-4 rounded-btn flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:bg-accent transition-colors shadow-sm"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Sending Request...
-                </>
-              ) : (
-                'Send Request'
-              )}
+              {loading ? 'Sending Request...' : 'Send Request'}
             </button>
           </form>
 
           {/* Direct Error Display */}
           {error && (
             <div className="p-3 bg-danger/10 border border-danger/30 rounded-btn text-xs text-danger flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span className="font-bold shrink-0">[Error]</span>
               <span>{error}</span>
             </div>
           )}
@@ -306,7 +297,6 @@ const RequestAnalyzer = () => {
           {/* Empty State */}
           {!result && (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-              <Radar className="w-16 h-16 text-secondary/35 mb-4 animate-pulse" />
               <h3 className="text-lg font-semibold text-primary mb-1">Awaiting Execution</h3>
               <p className="text-secondary text-sm max-w-xs">
                 Fill in the URL, configure methods, and click "Send Request" to analyze network attributes.
@@ -348,7 +338,7 @@ const RequestAnalyzer = () => {
                       <div className="bg-bg/40 p-4 border border-border rounded-btn shadow-sm">
                         <div className="text-[10px] text-secondary font-semibold uppercase tracking-wider">Status Code</div>
                         <div className="mt-2.5 flex items-center gap-2">
-                          <span className={`text-base font-semibold px-2 py-0.5 rounded border ${getStatusColorClass(result.status)}`}>
+                          <span className={`text-base font-semibold px-2 py-0.5 rounded border text-primary bg-bg border-border`}>
                             {result.status} {result.statusText}
                           </span>
                         </div>
@@ -357,7 +347,7 @@ const RequestAnalyzer = () => {
                       {/* Response Time */}
                       <div className="bg-bg/40 p-4 border border-border rounded-btn shadow-sm">
                         <div className="text-[10px] text-secondary font-semibold uppercase tracking-wider">Response Time</div>
-                        <div className={`text-xl font-bold mt-2 ${result.responseTime > 1000 ? 'text-danger' : 'text-primary'}`}>
+                        <div className="text-xl font-bold mt-2 text-primary">
                           {result.responseTime} ms
                         </div>
                       </div>
@@ -375,14 +365,12 @@ const RequestAnalyzer = () => {
                         <div className="text-[10px] text-secondary font-semibold uppercase tracking-wider">Protocol</div>
                         <div className="mt-2 flex items-center gap-2">
                           {result.protocol === 'HTTPS' ? (
-                            <span className="text-success bg-success/10 border border-success/25 px-2 py-0.5 rounded flex items-center gap-1 text-xs font-semibold">
-                              <ShieldCheck className="w-3.5 h-3.5" />
-                              HTTPS Secured
+                            <span className="text-primary bg-bg border border-border px-2 py-0.5 rounded text-xs font-semibold">
+                              HTTPS
                             </span>
                           ) : (
-                            <span className="text-danger bg-danger/10 border border-danger/25 px-2 py-0.5 rounded flex items-center gap-1 text-xs font-semibold">
-                              <AlertTriangle className="w-3.5 h-3.5" />
-                              Insecure HTTP
+                            <span className="text-primary bg-bg border border-border px-2 py-0.5 rounded text-xs font-semibold">
+                              HTTP
                             </span>
                           )}
                         </div>
@@ -413,8 +401,7 @@ const RequestAnalyzer = () => {
                     {/* Module 3: Protocol Intelligence Grid */}
                     {result.protocolIntelligence && (
                       <div className="border border-border rounded-btn overflow-hidden">
-                        <div className="bg-[#131620] border-b border-border p-3 flex items-center gap-2">
-                          <Network className="w-4 h-4 text-accent animate-pulse" />
+                        <div className="bg-[#131620] border-b border-border p-3">
                           <h3 className="text-xs font-bold text-primary uppercase tracking-wider font-mono">Protocol Intelligence</h3>
                         </div>
                         <div className="p-4 divide-y divide-border/40 space-y-2.5 text-xs bg-bg/20">
@@ -437,11 +424,7 @@ const RequestAnalyzer = () => {
                                   {row.value || '—'}
                                 </span>
                                 {row.isScheme && (
-                                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${
-                                    row.value === 'HTTPS'
-                                      ? 'bg-success/5 text-success border-success/20'
-                                      : 'bg-danger/5 text-danger border-danger/20'
-                                  }`}>
+                                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded border bg-bg border-border text-primary">
                                     {row.value === 'HTTPS' ? 'Secure' : 'Insecure'}
                                   </span>
                                 )}
@@ -459,15 +442,15 @@ const RequestAnalyzer = () => {
                         <div className="grid grid-cols-3 gap-3">
                           <div className="bg-bg/60 p-3 rounded-btn border border-border text-center">
                             <span className="block text-[9px] text-secondary font-semibold uppercase tracking-wider">Avg Latency</span>
-                            <span className="text-base font-bold text-accent mt-1 block font-mono">{result.performance.averageResponseTime} ms</span>
+                            <span className="text-base font-bold text-primary mt-1 block font-mono">{result.performance.averageResponseTime} ms</span>
                           </div>
                           <div className="bg-bg/60 p-3 rounded-btn border border-border text-center">
                             <span className="block text-[9px] text-secondary font-semibold uppercase tracking-wider">Fastest</span>
-                            <span className="text-base font-bold text-success mt-1 block font-mono">{result.performance.fastestResponseTime} ms</span>
+                            <span className="text-base font-bold text-primary mt-1 block font-mono">{result.performance.fastestResponseTime} ms</span>
                           </div>
                           <div className="bg-bg/60 p-3 rounded-btn border border-border text-center">
                             <span className="block text-[9px] text-secondary font-semibold uppercase tracking-wider">Slowest</span>
-                            <span className="text-base font-bold text-danger mt-1 block font-mono">{result.performance.slowestResponseTime} ms</span>
+                            <span className="text-base font-bold text-primary mt-1 block font-mono">{result.performance.slowestResponseTime} ms</span>
                           </div>
                         </div>
                         <div className="text-[10px] text-secondary/65 text-right font-mono italic">
@@ -499,9 +482,8 @@ const RequestAnalyzer = () => {
 
                       <button
                         onClick={handleCopy}
-                        className="bg-bg border border-border hover:border-accent text-secondary hover:text-primary px-3 py-1.5 rounded-btn flex items-center gap-1.5 text-xs font-semibold transition-colors"
+                        className="bg-bg border border-border hover:border-accent text-secondary hover:text-primary px-3 py-1.5 rounded-btn text-xs font-semibold transition-colors"
                       >
-                        <Copy className="w-3.5 h-3.5" />
                         {copied ? 'Copied!' : 'Copy'}
                       </button>
                     </div>
@@ -573,8 +555,8 @@ const RequestAnalyzer = () => {
                                   <td className="p-2.5 font-semibold text-primary flex items-center gap-1.5">
                                     {key}
                                     {isSecurity && (
-                                      <span className="bg-accent/15 text-accent text-[9px] font-bold px-1 py-0.2 rounded border border-accent/25 flex items-center">
-                                        🔒
+                                      <span className="bg-bg text-secondary text-[9px] font-bold px-1 py-0.2 rounded border border-border">
+                                        [SEC]
                                       </span>
                                     )}
                                   </td>
@@ -597,14 +579,12 @@ const RequestAnalyzer = () => {
                     <div className="flex items-center justify-between p-4 bg-bg/40 border border-border rounded-btn">
                       <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">HTTPS Status</span>
                       {result.protocol === 'HTTPS' ? (
-                        <span className="bg-success/10 text-success text-xs font-semibold px-3 py-1 rounded-btn border border-success/35 flex items-center gap-1.5">
-                          <ShieldCheck className="w-4 h-4" />
-                          HTTPS Enabled
+                        <span className="bg-bg text-primary text-xs font-semibold px-3 py-1 rounded-btn border border-border">
+                          [HTTPS SECURED]
                         </span>
                       ) : (
-                        <span className="bg-danger/10 text-danger text-xs font-semibold px-3 py-1 rounded-btn border border-danger/35 flex items-center gap-1.5">
-                          <AlertTriangle className="w-4 h-4" />
-                          Insecure HTTP
+                        <span className="bg-bg text-primary text-xs font-semibold px-3 py-1 rounded-btn border border-border">
+                          [INSECURE HTTP]
                         </span>
                       )}
                     </div>
@@ -613,7 +593,7 @@ const RequestAnalyzer = () => {
                     <div className="p-4 bg-bg/40 border border-border rounded-btn space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-primary uppercase tracking-wider font-mono">Security Score</span>
-                        <span className="text-lg font-bold font-mono" style={{ color: result.securityScore >= 80 ? '#22C55E' : result.securityScore >= 50 ? '#EAB308' : '#EF4444' }}>
+                        <span className="text-lg font-bold font-mono text-primary">
                           {result.securityScore} / 100
                         </span>
                       </div>
@@ -638,23 +618,19 @@ const RequestAnalyzer = () => {
                             <div key={item.key} className="flex items-start gap-3 p-3 bg-bg/20 border border-border rounded-btn">
                               <div className="mt-0.5 shrink-0">
                                 {isPresent ? (
-                                  <div className="bg-success/10 text-success p-1 rounded-full border border-success/20">
-                                    <Check className="w-3.5 h-3.5" />
-                                  </div>
+                                  <span className="text-[10px] font-bold font-mono text-primary">
+                                    [Present]
+                                  </span>
                                 ) : (
-                                  <div className="bg-danger/10 text-secondary p-1 rounded-full border border-border">
-                                    <X className="w-3.5 h-3.5" />
-                                  </div>
+                                  <span className="text-[10px] font-bold font-mono text-secondary">
+                                    [Missing]
+                                  </span>
                                 )}
                               </div>
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-semibold text-primary">{item.name}</span>
-                                  <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded border ${
-                                    isPresent 
-                                      ? 'bg-success/5 text-success border-success/20' 
-                                      : 'bg-danger/5 text-secondary border-border'
-                                  }`}>
+                                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded border bg-bg border-border text-primary">
                                     {isPresent ? 'PRESENT' : 'MISSING'}
                                   </span>
                                 </div>
@@ -668,51 +644,47 @@ const RequestAnalyzer = () => {
                   </div>
                 )}
 
-                {/* TAB 5: SMART INSIGHTS (Module 9 UI Specs) */}
+                {/* TAB 5: SMART INSIGHTS */}
                 {activeTab === 'insights' && (
                   <div className="space-y-3.5">
                     {result.insights && result.insights.map((insight, idx) => {
-                      let icon, cardStyle;
-                      
+                      let label, cardStyle;
                       if (insight.type === 'critical') {
-                        icon = <AlertOctagon className="w-5 h-5" />;
-                        cardStyle = 'border-l-4 border-danger bg-danger/10 text-danger';
+                        label = '[CRITICAL]';
+                        cardStyle = 'border-l-4 border-danger bg-[#1A1D27] text-primary';
                       } else if (insight.type === 'warning') {
-                        icon = <AlertTriangle className="w-5 h-5" />;
-                        cardStyle = 'border-l-4 border-warning bg-warning/10 text-warning';
+                        label = '[WARNING]';
+                        cardStyle = 'border-l-4 border-warning bg-[#1A1D27] text-primary';
                       } else {
-                        icon = <CheckCircle className="w-5 h-5" />;
-                        cardStyle = 'border-l-4 border-success bg-success/10 text-success';
+                        label = '[INFO]';
+                        cardStyle = 'border-l-4 border-success bg-[#1A1D27] text-primary';
                       }
 
                       return (
-                        <div key={idx} className={`flex gap-3.5 p-4 rounded-btn ${cardStyle} transition-all duration-150`}>
-                          <div className="mt-0.5 shrink-0">{icon}</div>
+                        <div key={idx} className={`flex gap-3.5 p-4 rounded-btn ${cardStyle} border border-border/40 transition-all duration-150`}>
+                          <div className="mt-0.5 shrink-0 text-xs font-mono font-bold select-none">{label}</div>
                           <div className="space-y-1 flex-1">
                             <div className="flex items-center gap-2.5">
-                              <h4 className="text-sm font-bold leading-tight">{insight.category} Recommendation</h4>
-                              <span className="text-[9px] font-extrabold uppercase tracking-widest opacity-80">{insight.type}</span>
+                              <h4 className="text-sm font-bold leading-tight text-primary">{insight.category} Recommendation</h4>
                             </div>
-                            <p className="text-xs opacity-90 leading-relaxed font-medium">{insight.message}</p>
+                            <p className="text-xs text-secondary leading-relaxed font-medium">{insight.message}</p>
                           </div>
                         </div>
                       );
                     })}
                     {(!result.insights || result.insights.length === 0) && (
                       <div className="flex flex-col items-center justify-center p-6 text-center text-secondary bg-bg/20 border border-border border-dashed rounded-btn">
-                        <CheckCircle className="w-10 h-10 text-success/60 mb-2" />
-                        <span className="text-xs font-semibold">No issues flagged. API meets optimal configuration.</span>
+                        <span className="text-xs font-semibold text-primary">No issues flagged. API meets optimal configuration.</span>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* TAB 6: RESPONSE STRUCTURE (Response Analyzer tab) */}
+                {/* TAB 6: RESPONSE STRUCTURE */}
                 {activeTab === 'structure' && (
                   <div className="space-y-4">
                     {!isValidJson ? (
                       <div className="flex flex-col items-center justify-center p-8 text-center bg-bg/20 border border-border border-dashed rounded-btn">
-                        <FileX className="w-12 h-12 text-secondary/35 mb-2" />
                         <h4 className="text-sm font-semibold text-primary">JSON analysis unavailable</h4>
                         <p className="text-xs text-secondary mt-1 max-w-xs">
                           Response Structure analysis is only available for JSON responses.
@@ -748,9 +720,8 @@ const RequestAnalyzer = () => {
                           <div className="space-y-3.5 text-xs">
                             {/* Nested Objects */}
                             <div className="flex items-start gap-2.5 bg-bg/20 border border-border p-3 rounded-btn">
-                              <Layers className="w-4 h-4 text-accent mt-0.5 shrink-0" />
                               <div>
-                                <span className="font-semibold text-primary">Nested Objects</span>
+                                <span className="font-semibold text-primary font-mono">[Nested Objects]</span>
                                 <p className="text-secondary text-[11px] mt-0.5 leading-relaxed">
                                   {deepStats.nestedObjects.length > 0 
                                     ? deepStats.nestedObjects.join(', ') 
@@ -761,9 +732,8 @@ const RequestAnalyzer = () => {
 
                             {/* Arrays */}
                             <div className="flex items-start gap-2.5 bg-bg/20 border border-border p-3 rounded-btn">
-                              <List className="w-4 h-4 text-success mt-0.5 shrink-0" />
                               <div>
-                                <span className="font-semibold text-primary">Arrays</span>
+                                <span className="font-semibold text-primary font-mono">[Arrays]</span>
                                 <p className="text-secondary text-[11px] mt-0.5 leading-relaxed">
                                   {deepStats.arrays.length > 0 
                                     ? deepStats.arrays.join(', ') 
@@ -775,16 +745,14 @@ const RequestAnalyzer = () => {
                             {/* Nesting depth and count */}
                             <div className="grid grid-cols-2 gap-3">
                               <div className="flex items-center gap-2.5 bg-bg/20 border border-border p-3 rounded-btn">
-                                <GitBranch className="w-4 h-4 text-warning shrink-0" />
                                 <div>
-                                  <span className="font-semibold text-primary block text-[11px]">Max Depth</span>
+                                  <span className="font-semibold text-primary block text-[11px] font-mono">[Max Depth]</span>
                                   <span className="text-secondary text-xs font-bold block mt-0.5">{deepStats.maxDepth} levels</span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2.5 bg-bg/20 border border-border p-3 rounded-btn">
-                                <Hash className="w-4 h-4 text-purple-400 shrink-0" />
                                 <div>
-                                  <span className="font-semibold text-primary block text-[11px]">Total Keys</span>
+                                  <span className="font-semibold text-primary block text-[11px] font-mono">[Total Keys]</span>
                                   <span className="text-secondary text-xs font-bold block mt-0.5">{deepStats.totalKeys} keys (deep)</span>
                                 </div>
                               </div>

@@ -1,14 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Radar, Zap, Clock, BarChart2, HeartPulse, Brain, X } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const links = [
-    { to: '/', label: 'Request Analyzer', icon: Zap },
-    { to: '/history', label: 'History', icon: Clock },
-    { to: '/analytics', label: 'Analytics', icon: BarChart2 },
-    { to: '/health', label: 'Health Monitor', icon: HeartPulse },
-    { to: '/insights', label: 'Smart Insights', icon: Brain },
+    { to: '/', label: 'Request Analyzer' },
+    { to: '/history', label: 'History' },
+    { to: '/analytics', label: 'Analytics' },
+    { to: '/health', label: 'Health Monitor' },
+    { to: '/insights', label: 'Smart Insights' },
   ];
 
   return (
@@ -27,38 +26,33 @@ const Sidebar = ({ isOpen, onClose }) => {
         <div className="flex flex-col gap-6">
           {/* Logo Section */}
           <div className="flex items-center justify-between px-2 py-1">
-            <div className="flex items-center gap-2.5">
-              <Radar className="w-5.5 h-5.5 text-accent animate-pulse" />
-              <span className="font-semibold text-base tracking-wide text-primary">PacketSight</span>
-            </div>
+            <span className="font-semibold text-base tracking-wide text-primary">PacketSight</span>
             
             {/* Close Button on Mobile */}
             <button 
               onClick={onClose}
-              className="text-secondary hover:text-primary md:hidden p-1 rounded-btn hover:bg-bg transition-colors"
+              className="text-secondary hover:text-primary md:hidden text-xs font-semibold px-1 py-0.5 rounded hover:bg-bg transition-colors"
             >
-              <X className="w-4 h-4" />
+              [Close]
             </button>
           </div>
 
           {/* Nav Links */}
           <nav className="flex flex-col gap-1">
             {links.map((link) => {
-              const Icon = link.icon;
               return (
                 <NavLink
                   key={link.to}
                   to={link.to}
-                  onClick={onClose} // Auto-close sidebar on mobile link click
+                  onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-btn text-xs font-semibold uppercase tracking-wider transition-all duration-150 ${
+                    `flex items-center px-3 py-2.5 rounded-btn text-xs font-semibold uppercase tracking-wider transition-all duration-150 ${
                       isActive
                         ? 'bg-accent text-white font-bold'
                         : 'text-secondary hover:text-primary hover:bg-[#222533]'
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
                   {link.label}
                 </NavLink>
               );
