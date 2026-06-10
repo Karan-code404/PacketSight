@@ -25,9 +25,14 @@ const Layout = () => {
         onClose={() => setIsMobileMenuOpen(false)} 
       />
 
-      {/* Primary content area */}
-      <main className="flex-1 md:ml-[220px] p-4 md:p-6 lg:p-8 min-h-screen overflow-y-auto">
-        <Outlet />
+      {/* Primary content area with copyright footer */}
+      <main className="flex-1 md:ml-[220px] p-4 md:p-6 lg:p-8 min-h-screen flex flex-col justify-between overflow-y-auto">
+        <div className="flex-grow">
+          <Outlet />
+        </div>
+        <footer className="mt-12 pt-4 border-t border-border/20 text-center text-[10px] text-secondary font-mono tracking-wide select-none">
+          © {new Date().getFullYear()} PacketSight. All rights reserved.
+        </footer>
       </main>
     </div>
   );
